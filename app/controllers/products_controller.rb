@@ -17,6 +17,46 @@ class ProductsController < ApplicationController
     @product = Product.new
   end
 
+
+  def pay
+    @products = Product.find(params[:id])
+    @payment = Payment.new
+
+    @payment.order_id = @payment.id.to_s + SecureRandom.random_number(10).to_s
+    @payment.session_id = SecureRandom.Random_number(10)
+    @payment.amount = @product.price
+    @payment.save
+    @tbk_url_cgi = "http://186.64.122.15/cgi-bin/ASL_ACME/tbk_bp_pago.cgi"
+    @tbk_tipo_production = "TR_NORMAL"
+    @tbk_url_exito = "http://aldo.beerly.cl/apps/succes"
+    @tbk_url_fracaso = "http://aldo.beerly.cl/apps/failure"
+
+
+  end
+
+
+
+  def confirmation
+    payment = Payment.where(order_id: params["TBK_ORDEN_COMPRA"]).where(session_id: params["TBK_ID_SESION"]).first
+    rejected = false
+    rejected = true if payment.nil?
+    rejected = true if payment.amount.to_s + "00" != params[:TBK_MONTO] 
+    rejected = true if !params.has_key?(:TBK_RESPUESTA) || !params.has_key?(:TBK_ORDEN_COMPRA) || !params.has_key?(:TBK_TIPO_TRANSACCION) || !params.has_key?(:TBK_MONTO) || !params.has_key?(:TBK_CODIGO_AUTORIZACION) || !params.has_key?(:TBK_FECHA_CONTABLE) || !params.has_key?(:TBK_HORA_TRANSACCION) || !params.has_key?(:TBK_ID_SESION) || !params.has_key?(:TBK_ID_TRANSACCION) || !params.has_key?(:TBK_TIPO_PAGO) || !params.has_key?(:TBK_NUMERO_CUOTAS) || !params.has_key?(:TBK_VCI) || !params.has_key?(:TBK_MAC)
+    rejected = true if payment.status
+
+    payment.status = true
+    payment.save
+    
+
+    logger.info "Hola me estoy llamando"
+    render text: "ACEPTADO"
+  end
+  
+
+
+
+
+
   # GET /products/1/edit
   def edit
   end
