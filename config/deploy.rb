@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '3.4.0'
 
-server "aldo.breedly.cl", user: "ubuntu", roles: %w{app web db}
+server "acme.com", user: "ubuntu", roles: %w{app web db}
 set :application, 'transbank'
 set :repo_url, 'git@github.com:asantos4000/transbank.git'
 
